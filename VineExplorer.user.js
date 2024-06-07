@@ -309,7 +309,7 @@ function detectCurrentPageType(){
 
 async function parseTileData(tile) {
     return new Promise((resolve, reject) => {
-                if (SETTINGS.DebugLevel > 5) console.log(`Called parseTileData(`, tile, ')');
+                if (SETTINGS.DebugLevel > 12) console.log(`Called parseTileData(`, tile, ')');
 
         const _id = tile.getAttribute('data-recommendation-id');
 
@@ -911,7 +911,7 @@ function favStarEventhandlerClick(event, data) {
 /**
  * Updates Style and Text of a Product Tile
  * @param {Product} prod
- * @returns 
+ * @returns
  */
 function updateTileStyle(prod) {
     if (SETTINGS.DebugLevel > 10) console.log(`Called updateTileStyle(${JSON.stringify(prod, null, 4)})`);
@@ -1964,6 +1964,9 @@ function initBackgroundScan() {
     }
 
     const _paginatinWaitLoop = setInterval(() => {
+
+
+
         const _pageinationData = getPageinationData(document.querySelector('#ave-iframe-backgroundloader').contentWindow.document);
         if (_pageinationData) {
             clearInterval(_paginatinWaitLoop);
@@ -1983,6 +1986,8 @@ function initBackgroundScan() {
 
             backGroundScanTimeout = setTimeout(initBackgroundScanSubFunctionScannerLoop, SETTINGS.BackGroundScanDelayPerPage);
             function initBackgroundScanSubFunctionScannerLoop(){
+                let startTime = performance.now(); // Get the Starttime to calculate the speed
+
                 if (_loopIsWorking) return;
                 _loopIsWorking = true;
 
@@ -2027,7 +2032,7 @@ function initBackgroundScan() {
                         break;
 
 
-                        
+
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.2 with _subStage: ', _subStage);
                         database.getAll().then((products) => {
                             const _needUpdate = [];
@@ -2080,11 +2085,16 @@ function initBackgroundScan() {
                     localStorage.setItem('AVE_BACKGROUND_SCAN_STAGE', _backGroundScanStage);
                     localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
                     _loopIsWorking = false;
-                    backGroundScanTimeout = setTimeout(initBackgroundScanSubFunctionScannerLoop, SETTINGS.BackGroundScanDelayPerPage + Math.round(Math.random() * SETTINGS.BackGroundScannerRandomness));
+
+                    let delay = SETTINGS.BackGroundScanDelayPerPage + Math.round(Math.random() * SETTINGS.BackGroundScannerRandomness)
+                    let timeElapsed = performance.now() - startTime;
+                    if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan(): Scantime: ', timeElapsed, ' Delay: ', delay);
+
+                    backGroundScanTimeout = setTimeout(initBackgroundScanSubFunctionScannerLoop, delay);
                 }
             }
         }
-    }, 250);
+    }, 250); //scan every 250ms
 }
 
 function backGroundTileScanner(url, cb) {
@@ -2558,9 +2568,8 @@ function init(hasTiles) {
                 }
             });
         })
-        
+
         _pageinationContainer.appendChild(_btn);
         _pageinationContainer.appendChild(_AveNextArrow);
     }
 }
-
