@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Vine Explorer Olum
 // @namespace    http://tampermonkey.net/
-// @version      0.10.8.9_O
+// @version      0.10.8.9_O_1
 // @updateURL    https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @downloadURL  https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @description  Better View, Search and Explore for Amazon Vine Products - Vine Voices Edition
@@ -18,11 +18,11 @@
 // @grant        GM.setValue
 // @grant        GM.xmlHttpRequest
 // @grant        unsafeWindow
-// @require      https://github.com/Olum-hack/AmazonVineExplorer/raw/main/main/globals.js
+// @require      https://github.com/Olum-hack/AmazonVineExplorer/raw/main/globals.js
 // @require      https://github.com/Olum-hack/AmazonVineExplorer/raw/main/class_db_handler.js
 // @require      https://github.com/Olum-hack/AmazonVineExplorer/raw/main/class_product.js
 
-// External Source
+// ==External Source==
 // @require      https://raw.githubusercontent.com/eligrey/FileSaver.js/v2.0.4/src/FileSaver.js
 // @require      https://raw.githubusercontent.com/Christof121/VineFetchFix/main/fetchfix.js
 // ==/UserScript==
