@@ -439,11 +439,8 @@ function addLeftSideButtons(forceClean) {
         window.scrollTo(0, 0);
     });
 
-
-
-
     _nodesContainer.appendChild(_setAllSeenBtn);
-    _nodesContainer.appendChild(_setAllSeenDBBtn);
+    if(SETTINGS.EnableBtnMarkAllAsSeen) _nodesContainer.appendChild(_setAllSeenDBBtn);
     _nodesContainer.appendChild(_backToTopBtn);
 
     // const _clearDBBtn = createButton('Datenbank Bereinigen', 'background-color: orange;', () => {
