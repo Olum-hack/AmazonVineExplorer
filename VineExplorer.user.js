@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Vine Explorer Olum
 // @namespace    http://tampermonkey.net/
-// @version      0.10.8.9_O_1
+// @version      0.10.8.9_O_2
 // @updateURL    https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @downloadURL  https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @description  Better View, Search and Explore for Amazon Vine Products - Vine Voices Edition
