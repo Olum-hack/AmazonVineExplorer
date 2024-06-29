@@ -19,6 +19,15 @@ We are aware of the issue and are working on a fix.
 
 ## Changelog:
 
+### Changelog Olum
+
+##### [28.06.2024] - Version O_4
+* Background sanner stops for 3 hours after full scan
+* Background sanner starts at page 0 after 10 hours
+* Show status of background scanner active page / max page
+* New Button for "Mark all as seen" -> Enable Button Mark all as seen
+  
+### Changelog Orginal
 ##### [28.06.2024] - Version 0.10.9.0.1
 * Little Bugfix to work with an external Partner
 
