@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Vine Explorer Olum
 // @namespace    http://tampermonkey.net/
-// @version      0.10.8.9_O_3
+// @version      0.10.8.9_O_4
 // @updateURL    https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @downloadURL  https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @description  Better View, Search and Explore for Amazon Vine Products - Vine Voices Edition
@@ -1970,6 +1970,7 @@ function initBackgroundScan() {
 
             let _loopIsWorking = false;
             let _subStage = 0;
+            let _PageMax =0;
             const _stageZeroSites = ['queue=potluck', 'queue=last_chance']
 
             backGroundScanTimeout = setTimeout(initBackgroundScanSubFunctionScannerLoop, SETTINGS.BackGroundScanDelayPerPage);
@@ -1979,11 +1980,26 @@ function initBackgroundScan() {
                 if (_loopIsWorking) return;
                 _loopIsWorking = true;
 
-                let _backGroundScanStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_STAGE')) || 0;
+                let TimeWaitingMS = Date.now() - (localStorage.getItem('AVE_BACKGROUND_SCAN_LAST_TIME') || 0);
+                let TimeWaitingMin = TimeWaitingMS / 1000 / 60;
+
+                if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan(): TimeWaitingMin ', TimeWaitingMin);
+
+                let _backGroundScanStage
+
+                //Nach 10 Stunden wird neu gestartet
+                if(TimeWaitingMin > 600) {
+                    _backGroundScanStage = 0;
+                    _subStage = 0;
+                    localStorage.setItem('AVE_BACKGROUND_SCAN_LAST_TIME', Date.now());
+                } else {
+                    _backGroundScanStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_STAGE')) || 0;
+                }
+
                 if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan(): loop with _backgroundScanStage ', _backGroundScanStage, ' and Substage: ', _subStage);
 
                 switch (_backGroundScanStage) {
-                    case 0:{    // potluck, last_chance
+                    case 0:{ // potluck, last_chance
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.0 with _subStage: ', _subStage);
                         if (_stageZeroSites[_subStage]) {
                             if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.0 with _subStage: ', _subStage, ' inside IF');
@@ -1997,22 +2013,38 @@ function initBackgroundScan() {
                         }
                         break;
                     }
-                    case 1: {   // queue=encore | queue=encore&pn=&cn=&page=2...x
-                        _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT'));
+                    case 1: { // queue=encore | queue=encore&pn=&cn=&page=2...x
+                        _subStage = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT')) || 0;
+
+                        // Alle 100 Seiten wird die maximale Seitenzahl geprüft
+                        if((_subStage % 100) == 0) {
+                            if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 update PAGE_MAX');
+
+                            let _pagedate = getPageinationData(document.querySelector('#ave-iframe-backgroundloader').contentWindow.document);
+                            if (_pagedate) {
+                                localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_MAX', _pageinationData.maxPage);
+                            }
+                        }
+
+                        _PageMax = parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX')) || 0;
+
                         if (SETTINGS.DebugLevel > 10) console.log('initBackgroundScan().loop.case.1 with _subStage: ', _subStage);
-                        updateBackgroundScanScreenText('Background Scanner Page: '+ _subStage+ ' / '+ localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX'));
-                        if (_subStage < (parseInt(localStorage.getItem('AVE_BACKGROUND_SCAN_PAGE_MAX')) || 0)) {
+                        updateBackgroundScanScreenText('Background Scanner Page: '+ _subStage+ ' / '+ _PageMax);
+
+                        //Wenn die maximale Seitenzahl nicht erreicht ist, wird gescannt
+                        if (_subStage < _PageMax) {
                             backGroundTileScanner(`${_baseUrl}?queue=encore&pn=&cn=&page=${_subStage + 1}` , () => {_scanFinished()});
                             _subStage++
                             localStorage.setItem('AVE_BACKGROUND_SCAN_PAGE_CURRENT', _subStage);
                         } else {
+                            localStorage.setItem('AVE_BACKGROUND_SCAN_LAST_TIME', Date.now());
                             _subStage = 0;
                             _backGroundScanStage++;
                             _scanFinished();
                         }
                         break;
                     }
-                    case 2: {   // qerry about other values (tax, real prize, ....) ~ 20 - 30 Products then loopover to stage 1
+                    case 2: { // qerry about other values (tax, real prize, ....) ~ 20 - 30 Products then loopover to stage 1
 
                         //Disaled due to Bugs fetching the Tax
                         _backGroundScanStage++;
@@ -2056,6 +2088,15 @@ function initBackgroundScan() {
                             _scanFinished();
                         }
                         break;
+                    }
+                    case 3: { //Warten für drei Stunden nach dem der Scan abgeschlossen ist
+                        updateBackgroundScanScreenText('Background Scanner Time Waiting: '+ TimeWaitingMin);
+
+                        if(TimeWaitingMin > 180)
+                        {
+                            _backGroundScanStage++;
+                        }
+                        _scanFinished();
                     }
                     default: {
                         cleanUpDatabase(() => {
@@ -2503,7 +2544,7 @@ function init(hasTiles) {
             }, 250);
         }
     });
-    
+
     _searchBarSpan.appendChild(_searchBarInput);
     _searchbarContainer.appendChild(_searchBarSpan);
 
