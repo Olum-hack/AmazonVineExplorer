@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Vine Explorer Olum
 // @namespace    http://tampermonkey.net/
-// @version      0.10.9.0.1_O_4
+// @version      0.10.9.0.1_O_5
 // @updateURL    https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @downloadURL  https://github.com/Olum-hack/AmazonVineExplorer/raw/main/VineExplorer.user.js
 // @description  Better View, Search and Explore for Amazon Vine Products - Vine Voices Edition
@@ -593,6 +593,7 @@ async function createTileFromProduct(product, btnID, cb) {
             </div>
         `;
         _tile.prepend(createFavStarElement(product, btnID));
+        _tile.prepend(createLasSeenElement(product, btnID));
         _tile.prepend(createShareElement(product, btnID));
         waitForHtmlElmement('.vvp-item-product-title-container', (_elem) => {
             insertHtmlElementAfter(_elem, createTaxInfoElement(product, btnID));
@@ -611,6 +612,63 @@ function createFavStarElement(prod, index = Math.round(Math.random()* 10000)) {
     _favElement.textContent = '★';
     if (prod.isFav) _favElement.style.color = SETTINGS.FavStarColorChecked; // SETTINGS.FavStarColorChecked = Gelb;
     return _favElement;
+}
+
+function createLasSeenElement(prod, index = Math.round(Math.random()* 10000)) {
+    const _lastSeenElement = document.createElement('div');
+    _lastSeenElement.setAttribute("id", `ave-p-lastSeen-${index || Math.round(Math.random() * 5000)}`);
+    _lastSeenElement.classList.add('ave-last-seen');
+    _lastSeenElement.textContent = 'Last seen: ' + timeAgo(new Date(toTimestamp(prod.ts_lastSeen)));
+    _lastSeenElement.style.float = 'left';
+    _lastSeenElement.style.display = 'flex';
+    return _lastSeenElement;
+}
+
+function timeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+
+    const interval = Math.floor(seconds / 31536000);
+
+    if (interval > 1) {
+        return interval + " years ago";
+    }
+    if (interval === 1) {
+        return interval + " year ago";
+    }
+
+    const months = Math.floor(seconds / 2628000);
+    if (months > 1) {
+        return months + " months ago";
+    }
+    if (months === 1) {
+        return months + " month ago";
+    }
+
+    const days = Math.floor(seconds / 86400);
+    if (days > 1) {
+        return days + " days ago";
+    }
+    if (days === 1) {
+        return days + " day ago";
+    }
+
+    const hours = Math.floor(seconds / 3600);
+    if (hours > 1) {
+        return hours + " hours ago";
+    }
+    if (hours === 1) {
+        return hours + " hour ago";
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes > 1) {
+        return minutes + " minutes ago";
+    }
+    if (minutes === 1) {
+        return minutes + " minute ago";
+    }
+
+    return "just now";
 }
 
 function createShareElement(prod, index = Math.round(Math.random()* 10000)) {
@@ -2561,6 +2619,7 @@ function addStyleToTile(_currTile, _product) {
         // Update Timestamps
     }
     _currTile.prepend(createFavStarElement(_product));
+    _currTile.prepend(createLasSeenElement(_product));
     _currTile.prepend(createShareElement(_product));
     // insertHtmlElementAfter((_currTile.getElementsByClassName('vvp-item-product-title-container')[0]), createTaxInfoElement(_product));
     waitForHtmlElmement('.vvp-item-product-title-container', (_elem) => {
