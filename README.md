@@ -28,6 +28,7 @@ We are aware of the issue and are working on a fix.
 * New Button for "Mark all as seen" -> Enable Button Mark all as seen
   
 ### Changelog Orginal
+[https://github.com/Amazon-Vine-Explorer/AmazonVineExplorer](https://github.com/Amazon-Vine-Explorer/AmazonVineExplorer)
 ##### [28.06.2024] - Version 0.10.9.0.1
 * Little Bugfix to work with an external Partner
 
