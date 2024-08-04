@@ -20,7 +20,9 @@ We are aware of the issue and are working on a fix.
 ## Changelog:
 
 ### Changelog Olum
-
+##### [04.08.2024] - Version O_5
+* Anzeige wann das Produkt das letzte Mal vom Scanner gefunden wurde
+  
 ##### [28.06.2024] - Version O_4
 * Background sanner stops for 3 hours after full scan
 * Background sanner starts at page 0 after 10 hours
